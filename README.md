@@ -1,2 +1,2 @@
 # docs
-Service that allow you to create bills and other docs
+Service that allow me to create bills and other docs
