@@ -1,0 +1,7 @@
+{
+    "require": {
+        "silex/silex": "~1.2",
+        "doctrine/orm": "2.4.7",
+        "phpoffice/phpexcel":"1.8.1"
+    }
+}
