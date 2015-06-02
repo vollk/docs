@@ -11,6 +11,9 @@ include_once dirname(__FILE__)."/lib/phpexcel/PHPExcel.php";
 
 class TemplateEngine {
 
+    const ROW_NUMBER = 40;
+    const COLUMN_NUMBER = 40;
+
     private $doc_data;
     private $template_path;
     private $dest_path;
@@ -33,9 +36,9 @@ class TemplateEngine {
         $objPHPExcel = \PHPExcel_IOFactory::load($this->template_path);
         $objPHPExcel->setActiveSheetIndex(0);
         $aSheet = $objPHPExcel->getActiveSheet();
-        for($row_number=1;$row_number < 40;$row_number++)
+        for($row_number=1;$row_number < self::ROW_NUMBER;$row_number++)
         {
-            for($col_number=0;$col_number < 40;$col_number++)
+            for($col_number=0;$col_number < self::COLUMN_NUMBER;$col_number++)
             {
                 $this->compileCellVal($aSheet, $col_number, $row_number);
             }
