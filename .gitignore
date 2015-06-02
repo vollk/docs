@@ -1,0 +1,4 @@
+vendor/*
+.idea/*
+www/docs/*
+composer.lock
