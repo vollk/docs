@@ -8,7 +8,7 @@
 require_once '../vendor/autoload.php';
 require_once '../app/Application.php';
 
-$app = new Application();
+$app = Application::getInstance();
 
 $app['debug'] = true;
 
@@ -28,7 +28,7 @@ $app->get('/db', function() use ($app) {
 
 $app->get('/acts/print/{id}', function($id) use ($app) {
     $model= $app->createModel('Acts');
-    $model->printAct($app, (int)$id);
+    $model->printAct((int)$id);
     return 1;
 });
 $app->run();

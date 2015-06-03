@@ -11,15 +11,24 @@ class Application extends Silex\Application
     public static  $appPath ;
     public static  $templatePath;
     public static  $docsPath;
-
-    public function __construct(array $values = array())
+    private static $instance;
+    private function __construct(array $values = array())
     {
         parent::__construct($values);
         $this->initPaths();
         $this->initDatabase();
         $this->initAutoload();
+        $this->initParamManager();
     }
 
+    public function getInstance()
+    {
+        if(is_null(self::$instance))
+        {
+            self::$instance = new self;
+        }
+        return self::$instance;
+    }
     public function initPaths()
     {
         self::$appPath = dirname(__FILE__);
@@ -43,6 +52,12 @@ class Application extends Silex\Application
         new ClassLoader();
     }
 
+    public function initParamManager()
+    {
+        require_once(self::$appPath.DIRECTORY_SEPARATOR.'ParamManager.php' );
+        $this['paramManager'] = new ParamManager();
+    }
+
     public function createModel($name)
     {
         $class_name = $name.'Model';
@@ -53,4 +68,6 @@ class Application extends Silex\Application
         else
             throw new Exception('model '.$class_name.' not found');
     }
+
+
 }
