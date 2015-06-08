@@ -10,9 +10,13 @@ class ParamManager {
     {
         $application = Application::getInstance();
         $db = $application['db'];
+        /**
+         * @var \Doctrine\DBAL\Connection $db
+         */
+
         $sql = <<<q
 select value from params where `name`=?
 q;
-        return $db->fetch($sql, array($paramName));
+        return $db->fetchColumn($sql, array($paramName));
     }
 } 
