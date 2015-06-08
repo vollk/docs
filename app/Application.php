@@ -12,7 +12,7 @@ class Application extends Silex\Application
     public static  $templatePath;
     public static  $docsPath;
     private static $instance;
-    private function __construct(array $values = array())
+    public function __construct(array $values = array())
     {
         parent::__construct($values);
         $this->initPaths();
@@ -21,7 +21,7 @@ class Application extends Silex\Application
         $this->initParamManager();
     }
 
-    public function getInstance()
+    public static function getInstance()
     {
         if(is_null(self::$instance))
         {
