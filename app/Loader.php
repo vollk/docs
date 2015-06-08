@@ -24,6 +24,12 @@ class ClassLoader {
             {
                 include $file;
             }
+
+            $file = Application::$appPath.DIRECTORY_SEPARATOR.$className .'.php';
+            if(file_exists($file))
+            {
+                include_once $file;
+            }
         }
     }
 }
