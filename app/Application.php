@@ -33,13 +33,13 @@ class Application extends Silex\Application
     {
         self::$appPath = dirname(__FILE__);
         self::$templatePath = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'templates';
-        self::$docsPath = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'www/docs';
+        self::$docsPath = 'docs';
     }
 
     public function initDatabase()
     {
         $config = new \Doctrine\DBAL\Configuration();
-        $connectionParams = include '../app/config/config.php';
+        $connectionParams = include self::$appPath.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php';
 
         $conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
         $conn->query("set names utf8")->execute();
@@ -58,15 +58,26 @@ class Application extends Silex\Application
         $this['paramManager'] = new ParamManager();
     }
 
+
+    /**
+     * @param $name
+     * @return BaseModel
+     * @throws Exception
+     */
     public function createModel($name)
     {
         $class_name = $name.'Model';
         if(class_exists($class_name))
         {
-            return new $class_name;
+            $model = new $class_name;
         }
         else
             throw new Exception('model '.$class_name.' not found');
+        /**
+         * @var $model BaseModel
+         */
+        $model->setDb($this['db']);
+        return $model;
     }
 
 
