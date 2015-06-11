@@ -5,30 +5,38 @@
  * Date: 17/05/15
  * Time: 16:27
  */
-require_once '../vendor/autoload.php';
-require_once '../app/Application.php';
+$app_dir = '../../docs_app';
+require_once $app_dir.'/vendor/autoload.php';
+require_once $app_dir.'/app/Application.php';
 
 $app = Application::getInstance();
 
 $app['debug'] = true;
 
-$app->before(function() use($app) {
-    $app->initDatabase();
-});
-
-$app->get('/hello/{name}', function($name) use($app) {
-    return $app->json(array('id'=>1,'name'=>'sdf'));
-});
-
-$app->get('/db', function() use ($app) {
-    $conn = $app['db'];
-    $res = $conn->query("select * from acts limit 1")->fetch();
-    return $app->json($res,200,array('Content-Type'=>'application/json; charset=utf-8'));
+$app->get('', function() {
+    ob_start();
+        include 'layout.html';
+    $res = ob_get_contents();
+    ob_end_clean();
+    return $res;
 });
 
 $app->get('/acts/print/{id}', function($id) use ($app) {
     $model= $app->createModel('Acts');
-    $model->printAct((int)$id);
-    return 1;
+    $file = $model->printAct((int)$id);
+    $file_name = basename($file);
+    $resp = $app->sendFile($file,200, array('Content-Disposition' => 'attachment; filename="'.$file_name.'"'));
+    $resp->deleteFileAfterSend(true);
+    return $resp;
 });
+
+$app->get('/bills/print/{id}', function($id) use ($app) {
+    $model= $app->createModel('Bills');
+    $file = $model->printBill((int)$id);
+    $file_name = basename($file);
+    $resp = $app->sendFile($file,200, array('Content-Disposition' => 'attachment; filename="'.$file_name.'"'));
+    $resp->deleteFileAfterSend(true);
+    return $resp;
+});
+
 $app->run();
