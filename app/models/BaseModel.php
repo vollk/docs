@@ -5,7 +5,7 @@
  * Time: 17:32
  */
 
-class BaseModel {
+abstract class BaseModel {
 
     /**
      * @var \Doctrine\DBAL\Connection $db
@@ -36,4 +36,18 @@ class BaseModel {
             'organization'=>$paramManager->getParam('organization'),
         ];
     }
-} 
+
+    protected function next_number($table_name, $year)
+    {
+        $db = $this->db;
+        $max = $db->createQueryBuilder()
+             ->select('max(number)')
+             ->from($table_name)
+             ->where('year = ?')
+            ->setParameter(0,$year)->execute()->fetch(PDO::FETCH_COLUMN);
+        return $max++;
+    }
+
+    abstract protected  function createObject(array $params);
+    abstract public  function createOne(array $params);
+}

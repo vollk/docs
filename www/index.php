@@ -9,6 +9,9 @@ $app_dir = '../../docs_app';
 require_once $app_dir.'/vendor/autoload.php';
 require_once $app_dir.'/app/Application.php';
 
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+
 $app = Application::getInstance();
 
 $app['debug'] = true;
@@ -38,5 +41,23 @@ $app->get('/bills/print/{id}', function($id) use ($app) {
     $resp->deleteFileAfterSend(true);
     return $resp;
 });
+
+$app->post('/bills/create', function(Request $request) use ($app) {
+
+    $params = $request->request->all();
+    $model= $app->createModel('Bills');
+    try{
+        $model->createOne($params);
+        $resp = $app->json(['success'=>true]);
+    }
+    catch(Exception $e)
+    {
+        $resp = $app->json(['success'=>false,'msg'=>$e->getMessage()]);
+    }
+
+    return $resp;
+});
+
+
 
 $app->run();
