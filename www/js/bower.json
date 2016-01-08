@@ -1,0 +1,22 @@
+{
+  "name": "js",
+  "homepage": "https://github.com/vollk/docs",
+  "authors": [
+    "vollk <ovkasatkin@mail.ru>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.8"
+  }
+}

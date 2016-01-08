@@ -42,6 +42,22 @@ $app->get('/bills/print/{id}', function($id) use ($app) {
     return $resp;
 });
 
+$app->post('/acts/create', function(Request $request) use ($app) {
+
+    $params = $request->request->all();
+    $model= $app->createModel('Acts');
+    try{
+        $model->createOne($params);
+        $resp = $app->json(['success'=>true]);
+    }
+    catch(Exception $e)
+    {
+        $resp = $app->json(['success'=>false,'msg'=>$e->getMessage()]);
+    }
+
+    return $resp;
+});
+
 $app->post('/bills/create', function(Request $request) use ($app) {
 
     $params = $request->request->all();
