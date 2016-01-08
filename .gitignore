@@ -2,3 +2,4 @@ vendor/*
 .idea/*
 www/docs/*
 composer.lock
+bower_components
