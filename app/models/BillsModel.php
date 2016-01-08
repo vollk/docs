@@ -62,44 +62,26 @@ q;
         return 'bill_'.$bill_data['number'].'.xls';
     }
 
-    protected  function createObject(array $billParams)
+    protected  function createObject(array $actParams)
     {
-        if(!$billParams['partner']) throw new Exception('partner not set');
-        if(!$billParams['sum']) throw new Exception('sum not set');
-        if(!$billParams['year']) throw new Exception('sum not set');
-        if(!$billParams['date']) throw new Exception('date not set');
-        if(!$billParams['desc']) throw new Exception('desc not set');
+        if(!$actParams['partner']) throw new Exception('partner not set');
+        if(!$actParams['sum']) throw new Exception('sum not set');
+        if(!$actParams['date']) throw new Exception('date not set');
+        if(!$actParams['desc']) throw new Exception('desc not set');
 
-        $date = DateUtils::make_date($billParams['date']);
-        $new_number = $this->next_number($this->table,$billParams['year']);
+        $date = DateUtils::make_date($actParams['date']);
+        $year = substr($date,0,4);
+        $new_number = $this->next_number($this->table,$year);
 
         $db = $this->db;
         $prepared = [
-            'partner'=>$billParams['partner'],
-            'sum'=>$billParams['sum'],
-            'year'=>$billParams['year'],
-            'date'=>$date,
-            'desc'=>$billParams['desc'],
-            'number'=>$new_number,
+            '`partner`'=>$actParams['partner'],
+            '`sum`'=>$actParams['sum'],
+            '`date`'=>$date,
+            '`desc`'=>$actParams['desc'],
+            '`number`'=>$new_number,
         ];
         $db->insert($this->table, $prepared);
     }
 
-    public function createOne(array $billParams)
-    {
-
-        $db = $this->db;
-        $db->beginTransaction();
-        try{
-            //throw new Exception(json_encode($billParams));
-            //throw new Exception(json_encode($billParams));
-            $this->createObject($billParams);
-        }
-        catch(Exception $e)
-        {
-            $db->rollBack();
-            throw $e;
-        }
-        return true;
-    }
 } 

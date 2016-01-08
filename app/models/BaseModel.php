@@ -43,11 +43,27 @@ abstract class BaseModel {
         $max = $db->createQueryBuilder()
              ->select('max(number)')
              ->from($table_name)
-             ->where('year = ?')
+             ->where('date LIKE "?%"')
             ->setParameter(0,$year)->execute()->fetch(PDO::FETCH_COLUMN);
-        return $max++;
+        return ++$max;
     }
 
     abstract protected  function createObject(array $params);
-    abstract public  function createOne(array $params);
+
+    public function createOne(array $docParams)
+    {
+
+        $db = $this->db;
+        $db->beginTransaction();
+        try{
+            $this->createObject($docParams);
+            $db->commit();
+        }
+        catch(Exception $e)
+        {
+            $db->rollBack();
+            throw $e;
+        }
+        return true;
+    }
 }
