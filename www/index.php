@@ -42,6 +42,15 @@ $app->get('/bills/print/{id}', function($id) use ($app) {
     return $resp;
 });
 
+$app->get('/acts', function() use ($app) {
+    /**
+     * @var $model ActsModel
+     */
+    $model= $app->createModel('Acts');
+    $resp = $app->json(['success'=>true,'records'=>$model->getActs()]);
+    return $resp;
+});
+
 $app->post('/acts/create', function(Request $request) use ($app) {
 
     $params = $request->request->all();
@@ -64,6 +73,38 @@ $app->post('/bills/create', function(Request $request) use ($app) {
     $model= $app->createModel('Bills');
     try{
         $model->createOne($params);
+        $resp = $app->json(['success'=>true]);
+    }
+    catch(Exception $e)
+    {
+        $resp = $app->json(['success'=>false,'msg'=>$e->getMessage()]);
+    }
+
+    return $resp;
+});
+
+$app->post('/bills/create-year', function(Request $request) use ($app) {
+    $params = $request->request->all();
+    $model= $app->createModel('Bills');
+
+    try{
+        $model->createYear($params);
+        $resp = $app->json(['success'=>true]);
+    }
+    catch(Exception $e)
+    {
+        $resp = $app->json(['success'=>false,'msg'=>$e->getMessage()]);
+    }
+
+    return $resp;
+});
+
+$app->post('/acts/create-year', function(Request $request) use ($app) {
+    $params = $request->request->all();
+    $model= $app->createModel('Acts');
+
+    try{
+        $model->createYear($params);
         $resp = $app->json(['success'=>true]);
     }
     catch(Exception $e)

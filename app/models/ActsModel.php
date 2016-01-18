@@ -23,6 +23,25 @@ class ActsModel extends BaseModel
         return $file_name;
     }
 
+    public function getActs()
+    {
+        $db = $this->db;
+        /**
+         * @var \Doctrine\DBAL\Connection $db
+         */
+        $sql = <<<q
+select
+    a.id,date,number,sum,`desc`,
+    p.name as partner,p.inn as partner_inn,p.kpp as partner_kpp,p.address as partner_address,
+    p.acc as partner_acc,p.kor_acc as partner_kor_acc,p.bank as partner_bank,p.bik as partner_bik,
+    p.phone as partner_phone
+from {$this->table} as a
+join partners as p on p.id = a.partner
+order by a.date desc
+q;
+        return $db->fetchAll($sql);
+    }
+
     private function getActData($id)
     {
         $db = $this->db;

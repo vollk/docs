@@ -43,8 +43,8 @@ abstract class BaseModel {
         $max = $db->createQueryBuilder()
              ->select('max(number)')
              ->from($table_name)
-             ->where('date LIKE "?%"')
-            ->setParameter(0,$year)->execute()->fetch(PDO::FETCH_COLUMN);
+             ->where("date LIKE ?")
+            ->setParameter(0,$year.'%',PDO::PARAM_STR)->execute()->fetch(PDO::FETCH_COLUMN);
         return ++$max;
     }
 
@@ -64,6 +64,38 @@ abstract class BaseModel {
             $db->rollBack();
             throw $e;
         }
+        return true;
+    }
+
+    public function createYear(array $params)
+    {
+        $months = DateUtils::getMonths();
+        $db = $this->db;
+
+        $desc_base = $params['desc'];
+
+        foreach($months as $i=>$month)
+        {
+            $year = $params['year'];
+            $num_monts = sprintf('%02s',$i+1);
+            $b_date = "$year-$num_monts-01";
+            $e_date = date("Y-m-t", strtotime($b_date));
+
+            $params['date'] = $e_date;
+            $params['desc'] = $desc_base.' за '.$month;
+            $db->beginTransaction();
+            try
+            {
+                $this->createObject($params);
+                $db->commit();
+            }
+            catch(Exception $e)
+            {
+                $db->rollBack();
+                throw $e;
+            }
+        }
+
         return true;
     }
 }
