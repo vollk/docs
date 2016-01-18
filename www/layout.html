@@ -4,10 +4,31 @@
         <script type="text/javascript" src="js/bower_components/angular/angular.js"></script>
     </head>
     <body>
-        <div ng-app="" ng-init="firstName='John'">
 
-        <p>The name is <span> {{firstName}}</span></p>
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <table>
+            <thead>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Number</th>
+                <th>Partner</th>
+                <th>Sum</th>
+                <th>Desc</th>
+            </thead>
+            <tr ng-repeat="record in records">
+                <td>{{record.id}}</td>
+                <td>{{record.date}}</td>
+                <td>{{record.number}}</td>
+                <td>{{record.partner}}</td>
+                <td>{{record.sum}}</td>
+                <td>{{record.desc}}</td>
+            </tr>
+        </table>
 
-        </div>
+    </div>
+
+    <script src="js/app/myApp.js"></script>
+    <script src="js/app/myCtrl.js"></script>
+
     </body>
 </html>
