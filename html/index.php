@@ -5,7 +5,12 @@
  * Date: 17/05/15
  * Time: 16:27
  */
-$app_dir = '../../docs_app';
+$env = getenv('ENVIRONMENT');
+if($env === 'PROD')
+    $app_dir = '../../docs_app';
+else
+    $app_dir = '..';
+
 require_once $app_dir.'/vendor/autoload.php';
 require_once $app_dir.'/app/Application.php';
 
@@ -42,12 +47,13 @@ $app->get('/bills/print/{id}', function($id) use ($app) {
     return $resp;
 });
 
-$app->get('/acts', function() use ($app) {
+$app->get('/acts', function(Request $request) use ($app) {
     /**
      * @var $model ActsModel
      */
     $model= $app->createModel('Acts');
-    $resp = $app->json(['success'=>true,'records'=>$model->getActs()]);
+    $filters = $request->get('filters');
+    $resp = $app->json(['success'=>true,'records'=>$model->getActs($filters)]);
     return $resp;
 });
 
