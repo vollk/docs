@@ -23,13 +23,13 @@ class ActsModel extends BaseModel
         return $file_name;
     }
 
-    public function getActs()
+    public function getActs($sort)
     {
         $db = $this->db;
         /**
          * @var \Doctrine\DBAL\Connection $db
          */
-        $sql = <<<q
+        /*$sql = <<<q
 select
     a.id,date,number,sum,`desc`,
     p.name as partner,p.inn as partner_inn,p.kpp as partner_kpp,p.address as partner_address,
@@ -38,8 +38,19 @@ select
 from {$this->table} as a
 join partners as p on p.id = a.partner
 order by a.date desc
-q;
-        return $db->fetchAll($sql);
+q;*/
+        $qb = $db->createQueryBuilder();
+        $qb->select(['a.id','a.date','a.number','a.sum','a.desc','p.name as partner'])
+            ->from($this->table,'a')
+            ->join('a','partners','p','p.id = a.partner');
+        if($sort)
+        {
+            $qb->orderBy('?');
+            $qb->setParameter(0,$sort,PDO::PARAM_STR);
+        }
+        //->where("date LIKE ?")
+
+        return $qb->execute()->fetchAll();
     }
 
     private function getActData($id)
