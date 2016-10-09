@@ -1,7 +1,11 @@
 <?
+use \Doctrine\DBAL\Query\QueryBuilder as Qb;
+
 class ActsModel extends BaseModel
 {
     private $table = "acts";
+
+    private $filter_config = ['id'=>'a.id'];
 
     public function printAct($id)
     {
@@ -23,23 +27,33 @@ class ActsModel extends BaseModel
         return $file_name;
     }
 
-    public function getActs()
+    public function getActs($serializeFilters)
     {
         $db = $this->db;
-        /**
-         * @var \Doctrine\DBAL\Connection $db
-         */
-        $sql = <<<q
-select
-    a.id,date,number,sum,`desc`,
-    p.name as partner,p.inn as partner_inn,p.kpp as partner_kpp,p.address as partner_address,
-    p.acc as partner_acc,p.kor_acc as partner_kor_acc,p.bank as partner_bank,p.bik as partner_bik,
-    p.phone as partner_phone
-from {$this->table} as a
-join partners as p on p.id = a.partner
-order by a.date desc
-q;
-        return $db->fetchAll($sql);
+        $select = $db->createQueryBuilder()
+            ->select(
+                'a.id',
+                'date',
+                'number',
+                'sum',
+                '`desc`',
+                'p.name as partner',
+                'p.inn as partner_inn',
+                'p.kpp as partner_kpp',
+                'p.address as partner_address',
+                'p.acc as partner_acc',
+                'p.kor_acc as partner_kor_acc',
+                'p.bank as partner_bank',
+                'p.bik as partner_bik',
+                'p.phone as partner_phone')
+            ->from($this->table,'a')
+            ->join('a','partners','p','p.id=a.partner')
+            ->orderBy('a.date','desc');
+
+        if($serializeFilters)
+            $this->applyFilters($select, $serializeFilters);
+        //throw new Exception($select->getSQL());
+        return $select->execute()->fetchAll();
     }
 
     private function getActData($id)
@@ -48,16 +62,27 @@ q;
         /**
          * @var \Doctrine\DBAL\Connection $db
          */
-        $sql = <<<q
-select a.id,date,number,sum,`desc`,
-p.name as partner,p.inn as partner_inn,p.kpp as partner_kpp,p.address as partner_address,
-p.acc as partner_acc,p.kor_acc as partner_kor_acc,p.bank as partner_bank,p.bik as partner_bik,
-p.phone as partner_phone
- from {$this->table} as a
- join partners as p on p.id = a.partner
- where a.id=?
-q;
-        return $db->fetchAssoc($sql, array((int) $id));
+        $select = $db->createQueryBuilder()
+            ->select(
+                'a.id',
+                'date',
+                'number',
+                'sum',
+                '`desc`',
+                'p.name as partner',
+                'p.inn as partner_inn',
+                'p.kpp as partner_kpp',
+                'p.address as partner_address',
+                'p.acc as partner_acc',
+                'p.kor_acc as partner_kor_acc',
+                'p.bank as partner_bank',
+                'p.bik as partner_bik',
+                'p.phone as partner_phone')
+            ->from($this->table,'a')
+            ->join('a','partners','p','p.id=a.partner')
+            ->where('a.id=?')
+            ->setParameter(0,(int) $id);
+        return $select->execute()->fetch();
     }
 
     private function prepareData(array & $data)
@@ -91,6 +116,19 @@ q;
             '`number`'=>$new_number,
         ];
         $db->insert($this->table, $prepared);
+    }
+
+    protected function applyFilters(Qb $select, $serializeFilters)
+    {
+        $filters = json_decode($serializeFilters,true);
+        $i = 0;
+        $select->where("1=1");
+        foreach($filters as $field=>$val)
+        {
+            $i++;
+            $db_column  = array_key_exists($field,$this->filter_config) ? $this->filter_config[$field] : $field;
+            $select->andWhere("$db_column LIKE :filter$i")->setParameter("filter$i",'%'.$val.'%');
+        }
     }
 
 }
