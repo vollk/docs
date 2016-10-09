@@ -48,6 +48,11 @@ class ActsModel extends BaseModel
                 'p.phone as partner_phone')
             ->from($this->table,'a')
             ->join('a','partners','p','p.id=a.partner')
+            if($sort)
+            {
+                $qb->orderBy('?');
+                $qb->setParameter(0,$sort,PDO::PARAM_STR);
+            }
             ->orderBy('a.date','desc');
 
         if($serializeFilters)
