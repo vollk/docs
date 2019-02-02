@@ -29,6 +29,40 @@ class BillsModel extends BaseModel{
         return $file_name;
     }
 
+    public function getBills($serializeFilters)
+    {
+        $db = $this->db;
+        $select = $db->createQueryBuilder()
+            ->select(
+                'b.id',
+                'date',
+                'number',
+                'sum',
+                '`desc`',
+                'p.name as partner',
+                'p.inn as partner_inn',
+                'p.kpp as partner_kpp',
+                'p.address as partner_address',
+                'p.acc as partner_acc',
+                'p.kor_acc as partner_kor_acc',
+                'p.bank as partner_bank',
+                'p.bik as partner_bik',
+                'p.phone as partner_phone')
+            ->from($this->table,'b')
+            ->join('b','partners','p','p.id=b.partner')
+            /*if($sort)
+            {
+                $qb->orderBy('?');
+                $qb->setParameter(0,$sort,PDO::PARAM_STR);
+            }*/
+            ->orderBy('b.date','desc');
+
+        if($serializeFilters)
+            $this->applyFilters($select, $serializeFilters);
+        //throw new Exception($select->getSQL());
+        return $select->execute()->fetchAll();
+    }
+
     /**
      * @param $id
      * @return array
@@ -82,6 +116,37 @@ q;
             '`number`'=>$new_number,
         ];
         $db->insert($this->table, $prepared);
+    }
+
+    public function getBillsByYearAndPartner($year, $partner)
+    {
+        $db = $this->db;
+        $select = $db->createQueryBuilder()
+            ->select(
+                'b.id',
+                'date',
+                'number',
+                'sum',
+                '`desc`',
+                'p.name as partner',
+                'p.inn as partner_inn',
+                'p.kpp as partner_kpp',
+                'p.address as partner_address',
+                'p.acc as partner_acc',
+                'p.kor_acc as partner_kor_acc',
+                'p.bank as partner_bank',
+                'p.bik as partner_bik',
+                'p.phone as partner_phone')
+            ->from($this->table,'b')
+            ->join('b','partners','p','p.id=b.partner')
+            ->orderBy('b.date','desc')
+            ->where("b.date <= '$year-12-31'")
+            ->andWhere("b.date >= '$year-01-01'")
+            ->andWhere('b.partner = :partner')
+            ->setParameter(':partner', $partner);
+
+
+        return $select->execute()->fetchAll();
     }
 
 } 

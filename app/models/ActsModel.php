@@ -48,16 +48,46 @@ class ActsModel extends BaseModel
                 'p.phone as partner_phone')
             ->from($this->table,'a')
             ->join('a','partners','p','p.id=a.partner')
-            if($sort)
+            /*if($sort)
             {
                 $qb->orderBy('?');
                 $qb->setParameter(0,$sort,PDO::PARAM_STR);
-            }
+            }*/
             ->orderBy('a.date','desc');
 
         if($serializeFilters)
             $this->applyFilters($select, $serializeFilters);
         //throw new Exception($select->getSQL());
+        return $select->execute()->fetchAll();
+    }
+
+    public function getActsByYearAndPartner($year, $partner)
+    {
+        $db = $this->db;
+        $select = $db->createQueryBuilder()
+            ->select(
+                'a.id',
+                'date',
+                'number',
+                'sum',
+                '`desc`',
+                'p.name as partner',
+                'p.inn as partner_inn',
+                'p.kpp as partner_kpp',
+                'p.address as partner_address',
+                'p.acc as partner_acc',
+                'p.kor_acc as partner_kor_acc',
+                'p.bank as partner_bank',
+                'p.bik as partner_bik',
+                'p.phone as partner_phone')
+            ->from($this->table,'a')
+            ->join('a','partners','p','p.id=a.partner')
+            ->orderBy('a.date')
+            ->where("a.date <= '$year-12-31'")
+            ->andWhere("a.date >= '$year-01-01'")
+            ->andWhere('a.partner = :partner')
+            ->setParameter(':partner', $partner);
+
         return $select->execute()->fetchAll();
     }
 

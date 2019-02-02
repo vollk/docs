@@ -47,6 +47,52 @@ $app->get('/bills/print/{id}', function($id) use ($app) {
     return $resp;
 });
 
+$app->get('/print/all-by-partner-and-year/{partner}/{year}', function($partner, $year) use ($app) {
+
+    set_time_limit(0);
+    /**
+     * @var BillsModel $billsModel
+     */
+    $billsModel= $app->createModel('Bills');
+
+    /**
+     * @var ActsModel $actsModel
+     */
+    $actsModel= $app->createModel('Acts');
+
+
+
+    $acts = $actsModel->getActsByYearAndPartner($year, $partner);
+    $bills = $billsModel->getBillsByYearAndPartner($year, $partner);
+
+    $archive = new ZipArchive();
+    $filename = "$year".'_'."$partner.zip";
+
+    if ($archive->open($filename, ZipArchive::CREATE)!==true) {
+        exit("Невозможно открыть <$filename>\n");
+    }
+
+    foreach ($acts as $act)
+    {
+        $actFile = $actsModel->printAct($act['id']);
+        $actName = basename($actFile);
+        $archive->addFile($actFile,"/".$actName);
+    }
+
+    foreach ($bills as $bill)
+    {
+        $billFile = $billsModel->printBill($bill['id']);
+        $billName = basename($billFile);
+        $archive->addFile($actFile,"/".$billName);
+    }
+
+    $archive->close();
+
+    $resp = $app->sendFile($filename,200, array('Content-Disposition' => 'attachment; filename="'.$filename.'"'));
+    $resp->deleteFileAfterSend(true);
+    return $resp;
+});
+
 $app->get('/acts', function(Request $request) use ($app) {
     /**
      * @var $model ActsModel
@@ -54,6 +100,16 @@ $app->get('/acts', function(Request $request) use ($app) {
     $model= $app->createModel('Acts');
     $filters = $request->get('filters');
     $resp = $app->json(['success'=>true,'records'=>$model->getActs($filters)]);
+    return $resp;
+});
+
+$app->get('/bills', function(Request $request) use ($app) {
+    /**
+     * @var $model BillsModel
+     */
+    $model= $app->createModel('Bills');
+    $filters = $request->get('filters');
+    $resp = $app->json(['success'=>true,'records'=>$model->getBills($filters)]);
     return $resp;
 });
 
