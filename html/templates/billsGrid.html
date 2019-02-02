@@ -1,0 +1,32 @@
+<table class = "grid" cellpadding="0" cellspacing="0" border="1">
+    <thead>
+    <tr>
+        <th width="10%" ng-click="sortGrid('id')">ID<span class="sortorder" ng-show="orderBy === 'id'" ng-class="{reverse:direction}"></span></th>
+        <th width="10%" ng-click="sortGrid('date')"><span class="sortorder" ng-show="orderBy === 'date'" ng-class="{reverse:direction}"></span>Date</th>
+        <th width="10%">Number</th>
+        <th width="20%" ng-click="sortGrid('partner')"><span class="sortorder" ng-show="orderBy === 'partner'" ng-class="{reverse:direction}"></span>Partner</th>
+        <th width="10%">Sum</th>
+        <th width="30%">Desc</th>
+        <th width="10%">Print</th>
+    </tr>
+    </thead>
+    <thead>
+    <td><input type="text" ng-model='filters["id"]' ng-change="filterGrid($event);"></td>
+    <td><input type="text" ng-model='filters["date"]' ng-change="filterGrid($event);"></td>
+    <td><input type="text" ng-model='filters["number"]' ng-change="filterGrid($event);"></td>
+    <td><input type="text" ng-model='filters["partner"]' ng-change="filterGrid($event);"></td>
+    <td><input type="text"></td>
+    <td><input type="text"></td>
+    </thead>
+    <tr ng-repeat="record in records">
+        <td>{{record.id}}</td>
+        <td>{{record.date}}</td>
+        <td>{{record.number}}</td>
+        <td>{{record.partner}}</td>
+        <td>{{record.sum}}</td>
+        <td>{{record.desc}}</td>
+        <td>
+            <a href="acts/print/{{record.id}}" target="_blank">print</a>
+        </td>
+    </tr>
+</table>
