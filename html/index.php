@@ -83,7 +83,7 @@ $app->get('/print/all-by-partner-and-year/{partner}/{year}', function($partner, 
     {
         $billFile = $billsModel->printBill($bill['id']);
         $billName = basename($billFile);
-        $archive->addFile($actFile,"/".$billName);
+        $archive->addFile($billFile,"/".$billName);
     }
 
     $archive->close();
