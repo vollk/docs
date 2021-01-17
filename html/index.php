@@ -177,6 +177,38 @@ $app->post('/acts/create-year', function(Request $request) use ($app) {
     return $resp;
 });
 
+$app->post('/acts/create-quarter', function(Request $request) use ($app) {
+    $params = $request->request->all();
+    $model= $app->createModel('Acts');
+
+    try{
+        $model->createQuarter($params);
+        $resp = $app->json(['success'=>true]);
+    }
+    catch(Exception $e)
+    {
+        $resp = $app->json(['success'=>false,'msg'=>$e->getMessage()]);
+    }
+
+    return $resp;
+});
+
+$app->post('/bills/create-quarter', function(Request $request) use ($app) {
+    $params = $request->request->all();
+    $model= $app->createModel('Bills');
+
+    try{
+        $model->createQuarter($params);
+        $resp = $app->json(['success'=>true]);
+    }
+    catch(Exception $e)
+    {
+        $resp = $app->json(['success'=>false,'msg'=>$e->getMessage()]);
+    }
+
+    return $resp;
+});
+
 
 
 $app->run();

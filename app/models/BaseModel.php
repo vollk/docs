@@ -98,4 +98,41 @@ abstract class BaseModel {
 
         return true;
     }
+
+    public function createQuarter(array $params)
+    {
+        $quatersBounds = DateUtils::getQuatersBounds();
+        $db = $this->db;
+
+        $desc_base = $params['desc'];
+
+        foreach($quatersBounds as $i=>$quaterBounds)
+        {
+            $year = $params['year'];
+
+            $bBound = $quaterBounds[0];
+            $eBound = $quaterBounds[1];
+            $b_date = "$year-$bBound";
+            $e_date = "$year-$eBound";
+
+            $params['date'] = $e_date;
+
+            $b_date_output = DateUtils::make_date_to_output($b_date);
+            $e_date_output = DateUtils::make_date_to_output($e_date);
+            $params['desc'] = $desc_base . " за период $b_date_output - $e_date_output";
+            $db->beginTransaction();
+            try
+            {
+                $this->createObject($params);
+                $db->commit();
+            }
+            catch(Exception $e)
+            {
+                $db->rollBack();
+                throw $e;
+            }
+        }
+
+        return true;
+    }
 }
